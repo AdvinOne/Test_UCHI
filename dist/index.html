@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7f6ce9">
+  <title>Контрольная работа — математика, 3 класс</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="exercise" id="exercise">
+    <header class="exercise-header">
+      <div class="progress" role="progressbar" aria-label="Пройдено заданий" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><div class="progress-fill"></div></div>
+      <p class="counter" id="counter"></p>
+    </header>
+    <section class="content" aria-labelledby="title">
+      <h1 id="title" tabindex="-1"></h1>
+      <p class="condition" id="condition" hidden></p>
+      <form id="answers" autocomplete="off" novalidate></form>
+      <p class="sr-only" id="feedback" role="status" aria-live="polite"></p>
+    </section>
+    <footer class="exercise-footer"><button class="main-button" id="continue" type="button" disabled>Продолжить</button></footer>
+  </main>
+</body>
+</html>
