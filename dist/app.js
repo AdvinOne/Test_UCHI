@@ -1,6 +1,6 @@
 'use strict';
 
-// Numbers and source nodes follow the annotations in «Математика 3 кл».
+// Full math sequence follows the left-to-right order of the Figma section.
 // The repeated exercise in № 3 is intentional: it is present in the source.
 const state = loadState();
 const courseUrl = 'course.html?subject=math&work=2';
@@ -28,27 +28,24 @@ function render(focusHeading = false) {
   condition.textContent = task.condition || '';
   document.querySelector('#counter').textContent = `Задание ${task.number} из ${TASKS.length}`;
   form.dataset.sourceNode = task.source;
+  form.dataset.kind = task.kind;
+  progress.setAttribute('aria-valuemax', String(TASKS.length));
   const attempt = state.attempts[state.current];
   let fieldIndex = 0;
   for (const row of task.rows) {
-    const div = document.createElement('div');
-    div.className = 'answer-row';
-    if (!row.some(part => typeof part === 'object')) div.classList.add('text-row');
-    if (task.number === 4 && (row[0] === 't − 64 = 21')) div.classList.add('section-gap');
-    for (const part of row) {
-      if (typeof part === 'string') {
-        const span = document.createElement('span');
-        span.textContent = part;
-        if (!/[а-яё]/i.test(part)) span.className = 'math';
-        div.append(span);
-      } else {
-        const input = document.createElement('input');
-        input.className = 'answer-field';
-        input.type = 'text';
-        input.inputMode = 'numeric';
-        input.pattern = '[0-9]*';
-        input.maxLength = 6;
-        input.spellcheck = false;
+    const …140 tokens truncated…= document.createElement(part.options ? 'select' : 'input');
+        input.className = part.options ? `answer-select${task === TASKS[5] ? ' answer-select-small' : ' answer-select-plan'}` : 'answer-field';
+        if (part.options) {
+          const placeholder = document.createElement('option');
+          placeholder.value = ''; placeholder.textContent = '...'; placeholder.disabled = true;
+          input.append(placeholder);
+          for (const value of part.options) {
+            const option=document.createElement('option'); option.value=value; option.textContent=value; input.append(option);
+          }
+        } else {
+          input.type = 'text'; input.inputMode = 'numeric'; input.pattern = '[0-9]*';
+          input.maxLength = 6; input.spellcheck = false;
+        }
         input.name = `answer-${fieldIndex}`;
         input.setAttribute('aria-label', part.label);
         input.value = attempt?.values[fieldIndex] || '';
@@ -58,13 +55,37 @@ function render(focusHeading = false) {
     }
     form.append(div);
   }
+  if (task.kind === 'pictures') renderPictures(task, attempt);
   nextButton.textContent = 'Продолжить';
   nextButton.disabled = !attempt?.checked;
   if (attempt?.checked) showChecked(task, attempt.values);
   if (focusHeading) title.focus();
 }
 
-function getInputs() { return [...form.querySelectorAll('input')]; }
+function renderPictures(task, attempt) {
+  const grid=document.createElement('div'); grid.className='picture-grid';
+  grid.setAttribute('role','group'); grid.setAttribute('aria-label','Выбери прямоугольник');
+  for (const choice of task.choices) {
+    const button=document.createElement('button'); button.type='button'; button.className='picture-choice';
+    button.dataset.value=choice.value; button.setAttribute('aria-label',`Прямоугольник ${choice.value}`);
+    button.setAttribute('aria-pressed',String(attempt?.values[0]===choice.value));
+    const number=document.createElement('span'); number.className='picture-number'; number.textContent=choice.value;
+    const crop=document.createElement('span'); crop.className='picture-window'; crop.setAttribute('aria-hidden','true');
+    const img=document.createElement('img'); img.src='assets/rectangles-source.png'; img.alt='';
+    // Use the uploaded source image unchanged, clipping only the diagram slots.
+    img.style.width=`${2058/340*100}%`; img.style.left=`${-choice.x/340*100}%`; img.style.top=`${-choice.y/340*100}%`;
+    crop.append(img); button.append(number,crop); grid.append(button);
+    button.addEventListener('click',()=>{
+      if (state.attempts[state.current]?.checked) return;
+      commitAnswers([choice.value]);
+    });
+  }
+  form.append(grid);
+}
+function getInputs() { return [...form.querySelectorAll('input,select')]; }
+function commitAnswers(values) {
+  state.attempts[state.current]={values,checked:true}; save(); showChecked(TASKS[state.current],values);
+}
 function storeDraft() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
   state.attempts[state.current] = {values:getInputs().map(input => input.value), checked:false};
@@ -74,20 +95,27 @@ function checkIfComplete() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
   const inputs = getInputs();
   // Wait for blur: the last answer can contain more than one digit.
-  if (inputs.some(input => !validNumber(input.value))) return;
-  const values = inputs.map(input => normalize(input.value));
-  state.attempts[state.current] = {values, checked:true};
-  save();
-  showChecked(TASKS[state.current], values);
+  const task=TASKS[state.current];
+  if (task.kind==='pictures' || inputs.some((input,i)=>!validValue(expected(task)[i],input.value))) return;
+  const values=inputs.map(input=>input instanceof HTMLSelectElement ? input.value : normalize(input.value));
+  commitAnswers(values);
 }
 function showChecked(task, values) {
   const checks = evaluate(task, values);
   getInputs().forEach((input, i) => {
     input.value = values[i];
-    input.readOnly = true;
+    if (input instanceof HTMLSelectElement) { input.disabled=true; input.dataset.correct=String(checks[i]); }
+    else input.readOnly = true;
     input.setAttribute('aria-invalid', String(!checks[i]));
     input.setAttribute('aria-description', checks[i] ? 'Ответ принят. Изменить нельзя.' : 'Неверный ответ. Изменить нельзя.');
   });
+  if (task.kind==='pictures') {
+    form.querySelectorAll('.picture-choice').forEach(button=>{
+      const selected=button.dataset.value===values[0];
+      button.disabled=true; button.setAttribute('aria-pressed',String(selected));
+      if (selected) { button.dataset.correct=String(checks[0]); button.setAttribute('aria-invalid',String(!checks[0])); }
+    });
+  }
   nextButton.disabled = false;
   const completed = state.attempts.filter(a => a?.checked).length;
   progress.setAttribute('aria-valuenow', String(completed));
@@ -103,6 +131,11 @@ form.addEventListener('input', event => {
   }
   event.target.value = event.target.value.replace(/[^0-9]/g, '');
   storeDraft();
+});
+form.addEventListener('change', event=>{
+  if (!(event.target instanceof HTMLSelectElement)) return;
+  if (state.attempts[state.current]?.checked) return;
+  storeDraft(); checkIfComplete();
 });
 form.addEventListener('focusout', event => {
   if (event.target instanceof HTMLInputElement) checkIfComplete();
