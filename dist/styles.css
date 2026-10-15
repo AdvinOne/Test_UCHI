@@ -3,3 +3,5 @@
 @media(min-width:1200px){.exercise{min-height:600px;min-height:max(600px,100svh)}}
 @media(max-width:600px){.exercise{padding:24px 20px;min-height:100svh}.exercise-header{margin-bottom:28px}.counter{margin-top:10px}h1{font-size:24px;line-height:30px;margin-bottom:20px}.condition{font-size:20px;line-height:30px;margin-bottom:20px}.answer-row{font-size:22px;line-height:30px;gap:8px;min-height:64px}.answer-field{width:76px;height:64px;font-size:24px;border-width:3px}.math{font-size:24px}.answer-row.section-gap{margin-top:16px}.exercise-footer{padding-top:28px}.result{font-size:20px;line-height:30px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.back-to-course{align-self:flex-start;color:#705bdc;text-decoration:none;margin-bottom:20px;font-size:15px}.back-to-course:focus-visible,.return-to-course:focus-visible{outline:3px solid #b4a7fa;outline-offset:5px}.return-to-course{display:block;margin:28px auto 0;color:#705bdc;font-size:18px;text-decoration:underline;text-underline-offset:4px}
