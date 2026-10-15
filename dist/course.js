@@ -1,5 +1,10 @@
 'use strict';
-const SUBJECTS = [{id:'math',name:'Математика'},{id:'russian',name:'Русский язык'},{id:'world',name:'Окружающий мир'},{id:'reading',name:'Литературное чтение'}];
+const SUBJECTS = [
+  {id:'math',name:'Математика',icon:'assets/math-icon.svg',width:90.8617,height:108.363},
+  {id:'russian',name:'Русский язык',icon:'assets/russian-icon.svg',width:137,height:137},
+  {id:'world',name:'Окружающий мир',icon:'assets/world-icon.png',width:137,height:137},
+  {id:'reading',name:'Литературное чтение',icon:'assets/reading-icon.png',width:137,height:137}
+];
 const WORKS = ['Вводная КР №1 (сентябрь)','КР №2 (октябрь)','КР №3 (декабрь)','КР №4 (март)','КР №5 (май)'];
 const params = new URLSearchParams(location.search);
 let selectedSubject = SUBJECTS.some(s=>s.id===params.get('subject')) ? params.get('subject') : 'math';
@@ -20,7 +25,11 @@ function renderCourse(){
     tab.addEventListener('keydown',event=>{let next=index;if(event.key==='ArrowRight')next=(index+1)%SUBJECTS.length;else if(event.key==='ArrowLeft')next=(index+SUBJECTS.length-1)%SUBJECTS.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=SUBJECTS.length-1;else return;event.preventDefault();selectedSubject=SUBJECTS[next].id;updateUrl();renderCourse();document.querySelector(`#tab-${selectedSubject}`).focus();});tabs.append(tab);
   });
   document.querySelector('#subject-panel').setAttribute('aria-labelledby',`tab-${selectedSubject}`);
-  document.querySelector('.subject-illustration img').alt=subject.name;
+  const subjectIcon=document.querySelector('.subject-illustration img');
+  subjectIcon.src=subject.icon;
+  subjectIcon.alt=subject.name;
+  subjectIcon.setAttribute('width',subject.width);
+  subjectIcon.setAttribute('height',subject.height);
   workList.replaceChildren();
   WORKS.forEach((name,index)=>{
     const button=document.createElement('button');button.type='button';button.className=`work-item${index+1===selectedWork?' is-selected':''}`;button.setAttribute('aria-current',index+1===selectedWork?'page':'false');
