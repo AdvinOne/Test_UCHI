@@ -12,3 +12,4 @@
 .picture-number{left:auto;right:6px}
 
 @media(max-width:480px){.picture-grid{grid-template-columns:minmax(0,1fr);gap:20px}}
+.picture-choice[aria-pressed="true"]:not(:disabled){border-color:var(--violet);background:#f2efff}.answer-field[readonly][aria-invalid="false"]{border-color:#84cf84;background:#efffef}

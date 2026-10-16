@@ -33,7 +33,18 @@ function render(focusHeading = false) {
   const attempt = state.attempts[state.current];
   let fieldIndex = 0;
   for (const row of task.rows) {
-    const …140 tokens truncated…= document.createElement(part.options ? 'select' : 'input');
+    const div = document.createElement('div');
+    div.className = 'answer-row';
+    if (!row.some(part => typeof part === 'object')) div.classList.add('text-row');
+    if (task.inputNumber === 4 && (row[0] === 't − 64 = 21')) div.classList.add('section-gap');
+    for (const part of row) {
+      if (typeof part === 'string') {
+        const span = document.createElement('span');
+        span.textContent = part;
+        if (!/[а-яё]/i.test(part)) span.className = 'math';
+        div.append(span);
+      } else {
+        const input = document.createElement(part.options ? 'select' : 'input');
         input.className = part.options ? `answer-select${task === TASKS[5] ? ' answer-select-small' : ' answer-select-plan'}` : 'answer-field';
         if (part.options) {
           const placeholder = document.createElement('option');
@@ -56,8 +67,7 @@ function render(focusHeading = false) {
     form.append(div);
   }
   if (task.kind === 'pictures') renderPictures(task, attempt);
-  nextButton.textContent = 'Продолжить';
-  nextButton.disabled = !attempt?.checked;
+  updateAction();
   if (attempt?.checked) showChecked(task, attempt.values);
   if (focusHeading) title.focus();
 }
@@ -77,12 +87,28 @@ function renderPictures(task, attempt) {
     crop.append(img); button.append(number,crop); grid.append(button);
     button.addEventListener('click',()=>{
       if (state.attempts[state.current]?.checked) return;
-      commitAnswers([choice.value]);
+      state.attempts[state.current]={values:[choice.value],checked:false};
+      save();
+      grid.querySelectorAll('.picture-choice').forEach(card=>card.setAttribute('aria-pressed',String(card===button)));
+      updateAction();
     });
   }
   form.append(grid);
 }
 function getInputs() { return [...form.querySelectorAll('input,select')]; }
+function draftValues() {
+  return TASKS[state.current].kind==='pictures' ? (state.attempts[state.current]?.values || []) : getInputs().map(input=>input.value);
+}
+function isComplete() {
+  const fields=expected(TASKS[state.current]);
+  const values=draftValues();
+  return values.length===fields.length && fields.every((field,i)=>validValue(field,values[i]));
+}
+function updateAction() {
+  const checked=state.attempts[state.current]?.checked;
+  nextButton.textContent=checked ? 'Далее' : 'Готово';
+  nextButton.disabled=!checked && !isComplete();
+}
 function commitAnswers(values) {
   state.attempts[state.current]={values,checked:true}; save(); showChecked(TASKS[state.current],values);
 }
@@ -90,14 +116,13 @@ function storeDraft() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
   state.attempts[state.current] = {values:getInputs().map(input => input.value), checked:false};
   save();
+  updateAction();
 }
 function checkIfComplete() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
-  const inputs = getInputs();
-  // Wait for blur: the last answer can contain more than one digit.
-  const task=TASKS[state.current];
-  if (task.kind==='pictures' || inputs.some((input,i)=>!validValue(expected(task)[i],input.value))) return;
-  const values=inputs.map(input=>input instanceof HTMLSelectElement ? input.value : normalize(input.value));
+  if (!isComplete()) return;
+  const fields=expected(TASKS[state.current]);
+  const values=draftValues().map((value,i)=>fields[i].options ? value : normalize(value));
   commitAnswers(values);
 }
 function showChecked(task, values) {
@@ -116,7 +141,7 @@ function showChecked(task, values) {
       if (selected) { button.dataset.correct=String(checks[0]); button.setAttribute('aria-invalid',String(!checks[0])); }
     });
   }
-  nextButton.disabled = false;
+  updateAction();
   const completed = state.attempts.filter(a => a?.checked).length;
   progress.setAttribute('aria-valuenow', String(completed));
   fill.style.width = `${completed / TASKS.length * 100}%`;
@@ -135,17 +160,14 @@ form.addEventListener('input', event => {
 form.addEventListener('change', event=>{
   if (!(event.target instanceof HTMLSelectElement)) return;
   if (state.attempts[state.current]?.checked) return;
-  storeDraft(); checkIfComplete();
-});
-form.addEventListener('focusout', event => {
-  if (event.target instanceof HTMLInputElement) checkIfComplete();
+  storeDraft();
 });
 form.addEventListener('submit', event => event.preventDefault());
 nextButton.addEventListener('click', () => {
   if (state.current === TASKS.length) {
     Object.assign(state, emptyState()); save(); render(true); return;
   }
-  if (!state.attempts[state.current]?.checked) return;
+  if (!state.attempts[state.current]?.checked) { checkIfComplete(); return; }
   state.current++;
   save(); render(true); window.scrollTo({top:0, behavior:'instant'});
 });
