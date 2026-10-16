@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5fc">
+  <title>Город на вырост — проба механики</title>
+  <link rel="stylesheet" href="tower.css">
+  <script src="../../math-data.js" defer></script>
+  <script src="tower-engine.js" defer></script>
+  <script src="tower.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="demo.html" aria-label="Город на вырост, начало"><span class="brand-icon" aria-hidden="true">▥</span><span>Город на вырост<small>Математика · 3 класс</small></span></a>
+      <nav class="tabs" aria-label="Режим"><button id="build-tab" class="tab active" aria-current="page">Строить</button><button id="city-tab" class="tab">Мой город <span id="city-count">0</span></button></nav>
+      <a class="original" href="../../course.html?subject=math&amp;work=2">Обычная контрольная ↗</a>
+    </header>
+
+    <main id="build-view">
+      <div class="intro"><span class="eyebrow">МАЛЕНЬКИЕ ОТВЕТЫ. БОЛЬШИЕ ПОСТРОЙКИ.</span><h1>Построй дом с характером</h1><p>Решай примеры — и смотри, как растёт твоя башня.</p></div>
+      <div class="workspace">
+        <section class="task-card" aria-labelledby="task-title">
+          <div class="task-meta"><span class="pill">Пробуем одно задание</span><span>01 / 01</span></div>
+          <h2 id="task-title">Вычисли.</h2>
+          <p class="task-hint" id="task-hint">Заполни все окошки. До нажатия «Готово» ответы можно менять.</p>
+          <form id="answers" autocomplete="off" novalidate></form>
+          <div class="task-bottom"><p class="feedback" id="feedback" role="status" aria-live="polite">Четыре ответа — четыре этажа.</p><button class="primary" id="submit" form="answers" type="submit" disabled>Готово <span aria-hidden="true">→</span></button></div>
+          <button class="text-button" id="retry" hidden>Попробовать заново</button>
+        </section>
+
+        <section class="scene-card" aria-labelledby="scene-title">
+          <div class="scene-heading"><div><span class="eyebrow">ТВОЯ ПОСТРОЙКА</span><h2 id="scene-title">Башня облачного мастера</h2></div><span class="floor-count" id="floor-count">0 / 4</span></div>
+          <div class="sky" id="sky">
+            <div class="sun" aria-hidden="true"></div><div class="cloud c1" aria-hidden="true"></div><div class="cloud c2" aria-hidden="true"></div><div class="cloud c3" aria-hidden="true"></div>
+            <div class="far-city" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="hills" aria-hidden="true"></div>
+            <div class="crane" id="crane" aria-hidden="true"><div class="crane-post"></div><div class="crane-arm"></div><div class="cable"></div><div class="waiting-block"><i></i><i></i><b></b></div></div>
+            <div class="tower" id="tower" role="img" aria-label="Пока построен только фундамент"><div class="foundation"></div><div class="door"></div></div>
+            <div class="tree tree-left" aria-hidden="true"></div><div class="tree tree-right" aria-hidden="true"></div>
+            <div class="builder" id="builder" aria-hidden="true"><div class="helmet"></div><div class="builder-face"><i></i><i></i></div><div class="builder-body"></div></div>
+            <span class="ground-label" id="ground-label">Место для твоей первой башни</span>
+          </div>
+          <div class="scene-caption"><span class="caption-star" aria-hidden="true">✦</span><p id="scene-caption">Кран подождёт. Решай в своём темпе.</p></div>
+        </section>
+      </div>
+      <aside class="how-it-works"><span><i class="dot mint"></i>Верно — этаж встанет ровно</span><span><i class="dot peach"></i>Ошибка — этаж чуть накренится</span><span><i class="dot violet"></i>Готовый дом поселится в городе</span></aside>
+    </main>
+
+    <main id="city-view" hidden>
+      <div class="intro"><span class="eyebrow">СОБИРАЙ СВОЙ МАЛЕНЬКИЙ МИР</span><h1>Город, который построил ты</h1><p>Каждая завершённая работа становится новым домом.</p></div>
+      <section class="city-scene" aria-label="Коллекция построек"><div class="sun" aria-hidden="true"></div><div class="cloud c1" aria-hidden="true"></div><div class="cloud c2" aria-hidden="true"></div><div id="city-buildings" class="city-buildings"></div><p id="empty-city">Здесь пока тихо. Давай построим первый дом!</p></section>
+      <div class="city-actions"><p id="city-summary" role="status"></p><button class="primary" id="back-to-build">Построить дом <span aria-hidden="true">→</span></button></div>
+    </main>
+    <footer class="page-footer">Лаборатория механик · отдельный эксперимент <span>Один экран из контрольной. Сохранения независимы.</span></footer>
+  </div>
+</body>
+</html>

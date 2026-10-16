@@ -1,0 +1,37 @@
+[hidden]{display:none!important}
+.tower-exercise{max-width:1280px;padding:28px 36px;min-height:100svh}
+.work-navigation{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;min-height:36px}
+.work-navigation .back-to-course{margin:0;align-self:center}
+.city-link{border:1px solid var(--border);border-radius:24px;background:#fff;color:#705bdc;padding:9px 16px;font:inherit;font-size:15px;cursor:pointer}
+.city-link span{color:#858390;margin-left:6px}.city-link[aria-pressed="true"]{border-color:var(--violet);background:#f4f1ff}
+.city-link:focus-visible,.secondary-button:focus-visible{outline:3px solid #b4a7fa;outline-offset:4px}
+.tower-exercise .exercise-header{margin:0 0 32px;width:calc(100% - 310px);max-width:800px}
+.work-layout{display:grid;grid-template-columns:minmax(0,800px) 280px;gap:30px;align-items:start;justify-content:space-between}
+.task-area{min-width:0;display:flex;flex-direction:column;min-height:calc(100svh - 186px)}
+.tower-exercise .content{width:100%}.tower-exercise .content h1{text-align:left}
+.tower-exercise .exercise-footer{padding-bottom:12px}.tower-exercise .main-button{font-size:15px;line-height:18px;padding:15px 18px}
+.building-panel{position:sticky;top:24px;border-radius:20px;background:#f6f5fa;border:1px solid #eceaf2;overflow:hidden}
+.building-heading{display:flex;flex-direction:column;gap:7px;padding:22px 24px 0}.building-heading h2{font-size:19px;line-height:24px;margin:0;font-weight:700}.building-heading>span{font-size:13px;line-height:18px;color:#858390}
+.building-scene{width:100%;max-width:300px;margin:auto}.building-scene svg{display:block;width:100%;height:auto}
+.building-caption{margin:0;padding:16px 22px 20px;font-size:14px;line-height:21px;color:#777484;border-top:1px solid #e8e5ef;min-height:79px}
+.tower-floor{transform-box:fill-box;transform-origin:center bottom}
+.tower-floor.landing{animation:floor-land .7s cubic-bezier(.25,.1,.6,1) both}
+.waiting-floor{transform-box:fill-box;transform-origin:center -20px;animation:floor-wait 4s ease-in-out infinite}
+.tower-bounce{transform-origin:150px 390px;animation:house-bounce .27s ease-in-out}
+.result-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:28px}
+.tower-exercise .result .result-caption{margin:24px auto 0}
+.tower-exercise .result{text-align:center;font-size:20px;line-height:30px}.result-grade{display:grid;place-items:center;background:#f0ecff;border-radius:22px;width:104px;height:104px;color:#705bdc;font-size:64px;line-height:1;font-weight:700;margin:16px auto 22px}.result-title{text-align:center!important}.result-caption{font-size:17px;line-height:26px;color:#777484;margin:24px auto 0;max-width:400px;text-align:center}
+.secondary-button{display:inline-block;border:1px solid var(--border);background:#fff;color:#705bdc;text-decoration:none;border-radius:30px;padding:14px 20px;font:inherit;font-size:15px;line-height:20px;cursor:pointer}
+.city-view h1{text-align:left;margin-bottom:12px}.city-description{color:#777484;font-size:18px;line-height:28px;margin:0 0 28px}
+.city-world{position:relative;min-height:420px;border-radius:24px;background:linear-gradient(#f5f3fd 0%,#faf9ff 78%,#edeeef 78%);border:1px solid #e9e7f0;overflow:auto;padding:24px 24px 0}
+.city-houses{display:flex;gap:16px;align-items:flex-end;width:max-content;min-width:100%;min-height:390px;padding:0 0 22px}
+.city-lot{width:210px;flex:0 0 210px;text-align:center}.city-lot svg{display:block;width:210px;height:308px;margin:0 auto 10px}.city-lot p{font-size:15px;line-height:20px;margin:0}.city-lot small{display:block;color:#858390;font-size:12px;margin-top:5px}
+#empty-city{position:absolute;inset:38% 20px auto;text-align:center;font-size:20px;line-height:32px;color:#858390;margin:0}
+.city-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:24px}.city-footer p{font-size:15px;color:#777484;line-height:24px}.storage-note{font-size:13px;color:#777484;text-align:center;line-height:20px;margin-top:20px}
+@keyframes floor-land{0%{translate:0 -110px;opacity:0}15%{opacity:1}78%{translate:0 0}88%{translate:0 -4px}100%{translate:0 0}}
+@keyframes floor-wait{0%,100%{rotate:-2deg}50%{rotate:2deg}}
+@keyframes house-bounce{25%{rotate:1deg}70%{rotate:-.7deg}}
+@media(min-width:1400px){.tower-exercise{padding-top:32px}.work-navigation{margin-bottom:30px}}
+@media(max-width:1080px){.tower-exercise{padding-inline:24px}.work-layout{grid-template-columns:minmax(0,1fr) 235px;gap:24px}.tower-exercise .exercise-header{width:calc(100% - 259px)}.building-heading{padding:20px 18px 0}.building-caption{padding:14px 18px;font-size:13px}.tower-exercise .answer-row{font-size:24px;gap:10px}.tower-exercise .answer-field{width:86px;height:72px}}
+@media(max-width:800px){.tower-exercise{padding:20px}.work-navigation{margin-bottom:24px;gap:12px}.work-navigation .back-to-course{font-size:13px}.city-link{font-size:13px;padding:8px 12px;white-space:nowrap}.tower-exercise .exercise-header{width:100%;max-width:100%;margin-bottom:18px}.work-layout{display:flex;flex-direction:column;gap:24px}.building-panel{order:-1;position:relative;top:auto;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 108px;grid-template-rows:auto auto;min-height:152px;border-radius:16px}.building-heading{padding:18px 18px 0;gap:5px}.building-heading h2{font-size:17px;line-height:22px}.building-caption{font-size:13px;line-height:19px;min-height:0;border:0;padding:8px 18px 18px;align-self:start;grid-column:1;grid-row:2}.building-scene{grid-column:2;grid-row:1/3;width:108px;align-self:end;margin:0 10px 0 0;max-width:100%}.task-area{width:100%;min-height:calc(100svh - 345px)}.tower-exercise .content h1{font-size:24px;line-height:32px;margin-bottom:20px}.tower-exercise .answer-row{font-size:22px;gap:8px}.tower-exercise .answer-field{width:76px;height:64px}.tower-exercise .picture-grid{gap:20px}.city-world{min-height:370px;padding-inline:12px}.city-houses{min-height:340px}.city-lot{width:180px;flex-basis:180px}.city-lot svg{width:180px;height:264px}.city-footer{flex-direction:column;align-items:stretch}.city-footer .main-button{align-self:center}.result-actions{flex-direction:column}.city-description{font-size:16px}.result-caption{font-size:15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
