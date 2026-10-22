@@ -19,6 +19,13 @@ async function main() {
     const errors=[];page.on('pageerror',error=>errors.push(error.message));
     const visit=route=>page.goto(new URL(route,base).href);
     const account=async()=>{await page.waitForFunction(()=>typeof AccessState!=='undefined' && AccessState.get()!==null);return page.evaluate(()=>AccessState.get());};
+    async function layout(name) {
+      for(const width of [360,390,640,1280]) {
+        await page.setViewportSize({width,height:844});
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${name} overflows at ${width}px`);
+        if(width===390)await page.screenshot({path:`/tmp/uchi-${name}-mobile.png`,fullPage:true});
+      }
+    }
     async function course() {await visit('course.html?subject=math&work=2');await page.waitForFunction(()=>typeof AccessState!=='undefined' && AccessState.get()?.balance>=0);}
     await course();assert.equal((await account()).balance,20);
     await page.locator('.variant-card[href]').click();await page.locator('#exercise').waitFor({state:'visible'});
@@ -29,19 +36,24 @@ async function main() {
     assert.equal(await page.locator('input').first().inputValue(),'0');assert.equal((await account()).balance,5);
     await page.locator('#back-to-course').click();await page.locator('#attempt-actions a').waitFor();
     await page.locator('#attempt-actions a').click();await page.waitForURL('**#child');
+    await page.locator('.child-card').waitFor();await layout('child');
     assert.equal((await account()).balance,5);assert.equal((await account()).attempt.progress.attempts[0].values[0],'0');
     await page.getByRole('button',{name:'Взрослый рядом'}).click();await page.waitForURL('**#parent');
     await page.screenshot({path:process.env.SCREENSHOT_DIR?path.join(process.env.SCREENSHOT_DIR,'paywall-desktop.png'):'/tmp/uchi-paywall-desktop.png',fullPage:true});
     assert.equal(await page.locator('img').evaluateAll(images=>images.filter(img=>!img.complete || !img.naturalWidth).length),0);
     await page.getByRole('button',{name:'Посмотреть условия'}).click();await page.waitForURL('**#captcha');
+    await page.locator('#captcha-answer').waitFor();await layout('captcha');
     await page.locator('#captcha-answer').fill('0');await page.locator('[name=adult]').check();await page.getByRole('button',{name:'К выбору доступа'}).click();
     await page.getByText('Пока не получилось.',{exact:false}).waitFor();
     const numbers=(await page.locator('.captcha-label').textContent()).match(/\d+/g).map(Number);
     await page.locator('#captcha-answer').fill(String(numbers[0]+numbers[1]));await page.getByRole('button',{name:'К выбору доступа'}).click();
     await page.waitForURL('**#plans');await page.reload();await page.locator('.selected-course').waitFor();
+    await layout('plans');
     await page.getByRole('button',{name:'К демо-оформлению'}).click();await page.waitForURL('**#checkout');
+    await page.locator('#demo-consent').waitFor();await page.goBack();await page.locator('.selected-course').waitFor();await page.goForward();await page.locator('#demo-consent').waitFor();await layout('checkout');
     await page.locator('#demo-failure').click();await page.getByText('Демо: покупка не завершена.',{exact:false}).waitFor();assert.equal((await account()).entitlement,null);
     await page.locator('#demo-consent').check();await page.locator('#demo-purchase').dblclick();await page.waitForURL('**#success');
+    await page.locator('.success-card').waitFor();await layout('success');
     assert.equal((await account()).balance,5);const expires=(await account()).entitlement;
     await page.reload();await page.locator('.success-card').waitFor();assert.equal((await account()).entitlement,expires);
     await page.getByRole('link',{name:'Вернуться к контрольной',exact:true}).click();await page.locator('#exercise').waitFor({state:'visible'});
