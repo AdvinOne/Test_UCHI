@@ -15,7 +15,7 @@ const FigmaTypography = {
     },
     {
       "id": "4186:30905",
-      "text": "Готов к контрольной",
+      "text": "Подготовиться к контрольной ",
       "width": 494,
       "height": 38,
       "fontSize": 32,
@@ -26,7 +26,7 @@ const FigmaTypography = {
     },
     {
       "id": "4186:30906",
-      "text": "Выполнить задания в точном формате реальной контрольной",
+      "text": "Выполнить задания в формате школьной контрольной",
       "width": 494,
       "height": 68,
       "fontSize": 24,
@@ -48,14 +48,14 @@ const FigmaTypography = {
     },
     {
       "id": "4186:30913",
-      "text": "Сразу после решения увидеть свою оценку",
+      "text": "Увидеть свою оценку сразу после решения",
       "width": 494,
-      "height": 68,
+      "height": 34,
       "fontSize": 24,
       "fontStyle": "Regular",
       "file": "type-4186-30913.svg",
       "renderWidth": 494,
-      "renderHeight": 68
+      "renderHeight": 34
     },
     {
       "id": "4186:30919",
@@ -70,14 +70,14 @@ const FigmaTypography = {
     },
     {
       "id": "4186:30920",
-      "text": "Система подсветит неверные ответы после решения",
+      "text": "Узнать неверные ответы после решения",
       "width": 494,
-      "height": 68,
+      "height": 34,
       "fontSize": 24,
       "fontStyle": "Regular",
       "file": "type-4186-30920.svg",
       "renderWidth": 494,
-      "renderHeight": 68
+      "renderHeight": 34
     },
     {
       "id": "I4195:71599;659:671",
@@ -114,7 +114,7 @@ const FigmaTypography = {
     },
     {
       "id": "4189:37387",
-      "text": "По 4 предметам: русский и тд",
+      "text": "Предмета в одной подписке",
       "width": 273,
       "height": 58,
       "fontSize": 24,
@@ -125,14 +125,14 @@ const FigmaTypography = {
     },
     {
       "id": "4189:37395",
-      "text": "На весь год ",
+      "text": "Контрольные за весь год",
       "width": 273,
-      "height": 29,
+      "height": 58,
       "fontSize": 24,
       "fontStyle": "Regular",
       "file": "type-4189-37395.svg",
       "renderWidth": 273,
-      "renderHeight": 29
+      "renderHeight": 58
     }
   ],
   "plans": [
@@ -1007,18 +1007,18 @@ const FigmaTypography = {
     },
     {
       "id": "3905:13108",
-      "text": " XXX ₽/мес",
-      "width": 100,
+      "text": " 125 ₽/мес",
+      "width": 89,
       "height": 24,
-      "fontSize": 20,
+      "fontSize": 0,
       "fontStyle": "Bold",
       "file": "type-3905-13108.svg",
-      "renderWidth": 100,
+      "renderWidth": 89,
       "renderHeight": 24
     },
     {
       "id": "3905:13109",
-      "text": "XXX ₽   XXX ₽/год",
+      "text": "1 500 ₽/год",
       "width": 158,
       "height": 20,
       "fontSize": 14,
@@ -1240,51 +1240,51 @@ const FigmaTypography = {
   "details": [
     {
       "id": "3911:17571",
-      "text": "Развитие навыков",
-      "width": 160,
+      "text": "Развитие навыков:",
+      "width": 165,
       "height": 24,
       "fontSize": 18,
       "fontStyle": "Bold",
       "file": "type-3911-17571.svg",
-      "renderWidth": 160,
+      "renderWidth": 165,
       "renderHeight": 24
     },
     {
       "id": "3911:17574",
-      "text": "Повторить школьную программу",
-      "width": 260,
+      "text": "Решение контрольных работ",
+      "width": 227,
       "height": 24,
       "fontSize": 16,
       "fontStyle": "Bold",
       "file": "type-3911-17574.svg",
-      "renderWidth": 260,
+      "renderWidth": 227,
       "renderHeight": 24
     },
     {
       "id": "3911:17577",
-      "text": "Оценить уровень подготовки к КР",
-      "width": 269,
+      "text": "Внимательность",
+      "width": 130,
       "height": 24,
       "fontSize": 16,
       "fontStyle": "Bold",
       "file": "type-3911-17577.svg",
-      "renderWidth": 269,
+      "renderWidth": 130,
       "renderHeight": 24
     },
     {
       "id": "3911:17579",
-      "text": "Устранить пробелы в знаниях",
-      "width": 233,
+      "text": "Уверенность",
+      "width": 102,
       "height": 24,
       "fontSize": 16,
       "fontStyle": "Bold",
       "file": "type-3911-17579.svg",
-      "renderWidth": 233,
+      "renderWidth": 102,
       "renderHeight": 24
     },
     {
       "id": "3911:17587",
-      "text": "Курс для 2–4 классов по математике, русскому языку, окружающему миру и литературному чтению. Задания в формате школьных контрольных — с постепенным усложнением. При ошибке система подсветит неверные ответы.",
+      "text": "Курс-подготовка к контрольным для учеников 2–4 классов по математике, русскому языку, окружающему миру и литературному чтению. Ребёнок сможет подготовиться к проверочной, проверить уровень знаний и найти слабые места.",
       "width": 734,
       "height": 73,
       "fontSize": 16,
@@ -1429,7 +1429,7 @@ const FigmaTypography = {
     },
     {
       "id": "3911:23218",
-      "text": "XXX ₽",
+      "text": "1500 ₽",
       "width": 80,
       "height": 22,
       "fontSize": 18,
@@ -1517,7 +1517,7 @@ const FigmaTypography = {
     },
     {
       "id": "3911:23045",
-      "text": "XXX ₽",
+      "text": "1500₽ ₽",
       "width": 103,
       "height": 21,
       "fontSize": 24,
@@ -1561,12 +1561,69 @@ const FigmaTypography = {
       "renderWidth": 62,
       "renderHeight": 24
     }
+  ],
+  "captcha": [
+    {
+      "id": "4231:164161",
+      "text": "Не хватает бусин",
+      "width": 404,
+      "height": 38,
+      "fontSize": 32,
+      "fontStyle": "Bold",
+      "file": "type-4231-164161.svg",
+      "renderWidth": 404,
+      "renderHeight": 38
+    },
+    {
+      "id": "4231:164162",
+      "text": "Позови родителей, чтобы они открыли доступ",
+      "width": 440,
+      "height": 24,
+      "fontSize": 18,
+      "fontStyle": "Regular",
+      "file": "type-4231-164162.svg",
+      "renderWidth": 440,
+      "renderHeight": 24
+    },
+    {
+      "id": "4231:164165",
+      "text": "64 =",
+      "width": 66,
+      "height": 38,
+      "fontSize": 32,
+      "fontStyle": "Bold",
+      "file": "type-4231-164165.svg",
+      "renderWidth": 66,
+      "renderHeight": 38
+    },
+    {
+      "id": "I4231:164167;2282:6823",
+      "text": "Ответ",
+      "width": 156,
+      "height": 24,
+      "fontSize": 18,
+      "fontStyle": "Regular",
+      "file": "type-I4231-164167-2282-6823.svg",
+      "renderWidth": 156,
+      "renderHeight": 24
+    },
+    {
+      "id": "I4231:164169;2278:5982",
+      "text": "Проверить ответ",
+      "width": 150,
+      "height": 22,
+      "fontSize": 18,
+      "fontStyle": "Bold",
+      "file": "type-I4231-164169-2278-5982.svg",
+      "renderWidth": 150,
+      "renderHeight": 22
+    }
   ]
 };
 
 function applyFigmaTypography(container, screen) {
   const normalize = value => value.replace(/\s+/g, ' ').trim();
-  const entries = screen === 'details' ? [...FigmaTypography.plans, ...FigmaTypography.details] : screen === 'plans' ? [...FigmaTypography.plans,...FigmaTypography.cart] : screen === 'captcha' ? FigmaTypography.plans : FigmaTypography[screen] || [];
+  const entries = screen === 'details' ? [...FigmaTypography.plans, ...FigmaTypography.details] : screen === 'plans' ? [...FigmaTypography.plans,...FigmaTypography.cart] : screen === 'captcha' ? FigmaTypography.captcha : FigmaTypography[screen] || [];
   const labels = new Map();
   for (const entry of entries) {
     const key = normalize(entry.text);
@@ -1583,7 +1640,8 @@ function applyFigmaTypography(container, screen) {
       const score = item => Math.abs(item.fontSize-fontSize) + (/(Bold|Heavy|Extra)/i.test(item.fontStyle) === bold ? 0 : 100);
       return score(first)-score(second);
     })[0];
-    if(element.classList.contains('receipt-discount'))entry=choices.find(item=>item.id==='3911:23039')||entry;
+    if(element.dataset.figmaType)entry=choices.find(item=>item.id===element.dataset.figmaType)||entry;
+    else if(element.classList.contains('receipt-discount'))entry=choices.find(item=>item.id==='3911:23039')||entry;
     else if(element.matches('.receipt-line>span'))entry=choices.find(item=>item.id==='3911:23036')||entry;
     const image = document.createElement('img');
     image.src = 'assets/figma-desktop/' + entry.file;

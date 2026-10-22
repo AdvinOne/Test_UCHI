@@ -5,7 +5,7 @@ const params = new URLSearchParams(location.search);
 const courseUrl = 'course.html?subject=math&work=2';
 const returnUrl = `index.html?${params.toString()}`;
 const intent = params.get('start') || 'resume';
-const confirmationKey = `uchi-parent-demo:${intent}`;
+const confirmationKey = `uchi-parent-demo-v2:${intent}`;
 const selectionKey = `uchi-control-cart:${intent}`;
 let account;
 let selected = false;
@@ -18,21 +18,16 @@ function confirmed() {
 function navigate(step) {location.hash=step;}
 function render() {
   if (!account) return;
-  let step=location.hash.slice(1) || 'parent';
+  let step=location.hash.slice(1) || 'captcha';
   if (step==='child' || !['parent','captcha','plans','details','checkout'].includes(step)) {
-    history.replaceState(null,'',`${location.pathname}${location.search}#parent`);step='parent';
+    history.replaceState(null,'',`${location.pathname}${location.search}#captcha`);step='captcha';
   }
-  if (['plans','details','checkout'].includes(step) && !confirmed()) {location.replace(`${location.pathname}${location.search}#captcha`);return;}
+  if (['parent','plans','details','checkout'].includes(step) && !confirmed()) {location.replace(`${location.pathname}${location.search}#captcha`);return;}
+  if (step==='checkout' && !selected) {location.replace(`${location.pathname}${location.search}#plans`);return;}
   document.body.className=`access-page step-${step}`;
-  document.title=step==='checkout'?'Демо — Оплата картой':step==='captcha'?'Позови родителя — Контрольные работы':step==='parent'?'Контрольные работы':'Выберите идеальный формат обучения';
+  document.title=step==='checkout'?'Демо — Оплата картой':step==='captcha'?'Не хватает бусин — Контрольные работы':step==='parent'?'Контрольные работы':'Выберите идеальный формат обучения';
   content.innerHTML=step==='parent'?DesktopAccess.paywall():step==='captcha'?DesktopAccess.captcha():step==='details'?DesktopAccess.details():step==='checkout'?DesktopAccess.checkout():DesktopAccess.plans(selected);
   applyFigmaTypography(content,step);
-  if(step==='captcha') {
-    document.querySelector('[data-read-captcha]').replaceChildren();
-    for(const className of ['captcha-front-brand','captcha-front-vpr']) {
-      const art=document.createElement('span');art.className=className;art.setAttribute('aria-hidden','true');content.append(art);
-    }
-  }
   updateScale();
   window.scrollTo(0,step==='plans'&&selected?1559:0);
   content.focus();
@@ -63,10 +58,10 @@ async function purchase() {
   finally {busy=false;}
 }
 content.addEventListener('click',event=>{
-  const target=event.target.closest('button,[data-close-captcha],[data-step]');
+  const target=event.target.closest('button,[data-course],[data-step]');
   if (!target) return;
   if (target.hasAttribute('data-course')) {location.href=courseUrl;return;}
-  if (target.hasAttribute('data-close-captcha')) {navigate('parent');return;}
+
   if (target.dataset.step) {navigate(target.dataset.step);return;}
   if (target.hasAttribute('data-select-control')) {
     selected=!selected;
@@ -79,7 +74,7 @@ content.addEventListener('click',event=>{
     const input=document.querySelector('[name=cvc]');const visible=input.type==='password';input.type=visible?'text':'password';target.setAttribute('aria-label',visible?'Скрыть CVC':'Показать CVC');return;
   }
   if (target.hasAttribute('data-read-captcha')) {
-    if ('speechSynthesis' in window) {const message=new SpeechSynthesisUtterance('Позови родителя. Решите пример и узнайте о специальных предложениях.');message.lang='ru-RU';speechSynthesis.speak(message);}return;
+    if ('speechSynthesis' in window) {const message=new SpeechSynthesisUtterance('Не хватает бусин. Позови родителей, чтобы они открыли доступ. Квадратный корень из шестидесяти четырёх равен?');message.lang='ru-RU';speechSynthesis.speak(message);}return;
   }
   if (target.dataset.period==='2') return;
   if (target.hasAttribute('data-period') || target.hasAttribute('data-other-product')) alert('Этот вариант показан по макету. В прототипе доступен путь покупки курса «Контрольные работы» на год. Реальной оплаты нет.');
@@ -89,14 +84,14 @@ content.addEventListener('submit',event=>{
   if (event.target.id==='payment-form') {purchase();return;}
   if (event.target.id!=='parent-form') return;
   const answer=event.target.elements.answer;
-  if (answer.value.trim()!=='192') {
+  if (answer.value.trim()!=='8') {
     answer.setAttribute('aria-invalid','true');document.querySelector('#captcha-error').textContent='Неверный ответ. Попробуйте ещё раз.';answer.focus();return;
   }
-  try {sessionStorage.setItem(confirmationKey,JSON.stringify({until:Date.now()+15*60*1000,order:crypto.randomUUID()}));navigate('plans');}
+  try {sessionStorage.setItem(confirmationKey,JSON.stringify({until:Date.now()+15*60*1000,order:crypto.randomUUID()}));navigate('parent');}
   catch {document.querySelector('#captcha-error').textContent='Разрешите сохранение данных браузером для продолжения.';}
 });
 document.addEventListener('keydown',event=>{
-  if (event.key==='Escape') {if(location.hash==='#details')navigate('plans');else if(location.hash==='#captcha')navigate('parent');}
+  if (event.key==='Escape') {if(location.hash==='#details')navigate('plans');else if(location.hash==='#captcha')location.href=courseUrl;}
 });
 window.addEventListener('resize',updateScale);
 window.addEventListener('hashchange',render);

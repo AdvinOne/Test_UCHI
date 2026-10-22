@@ -244,7 +244,7 @@ async function startExercise() {
   } catch (error) {
     if (error.code === 'BALANCE') {
       const params = new URLSearchParams(location.search);
-      location.replace(`access.html?${params.toString()}#child`);
+      location.replace(`access.html?${params.toString()}#captcha`);
     } else showSaveError(error);
   }
 }

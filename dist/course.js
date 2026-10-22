@@ -1,4 +1,5 @@
 'use strict';
+if(new URLSearchParams(location.search).has('accessBackdrop'))document.documentElement.classList.add('access-backdrop');
 const SUBJECTS = [
   {id:'math',name:'Математика',icon:'assets/math-icon.svg',width:90.8617,height:108.363},
   {id:'russian',name:'Русский язык',icon:'assets/russian-icon.svg',width:137,height:137},
@@ -40,14 +41,23 @@ function renderCourse(){
   });
   document.querySelector('#work-title').textContent=WORKS[selectedWork-1];
   cards.replaceChildren();
-  ['лёгкий','средний','сложный'].forEach((difficulty,index)=>{
+  CourseCards.previews[selectedSubject].forEach((preview,index)=>{
+    const difficulty=['лёгкий','средний','сложный'][index];
     const enabled=selectedSubject==='math'&&selectedWork===2&&index===0;
     const card=document.createElement(enabled&&account?'a':'div');card.className='variant-card';if(enabled&&account){card.href=result?AccessState.restartUrl():'index.html?from=course';card.setAttribute('aria-label',result?'Пройти контрольную ещё раз':account.attempt?'Продолжить контрольную':'Начать контрольную за 15 бусин');}else{card.setAttribute('aria-disabled','true');}
-    const asset=document.createElement('span');asset.className='card-asset';asset.setAttribute('aria-hidden','true');const img=document.createElement('img');img.src='assets/course-shell.png';img.alt='';asset.append(img);
-    const number=document.createElement('span');number.className='card-number';number.textContent=index+1;
-    const label=document.createElement('span');label.className='card-label';label.textContent=`Вариант ${index+1} (${difficulty})`;
-    const status=document.createElement('span');status.className='card-status';status.textContent=enabled?(result?`Пройдено · Оценка: ${result.grade}`:saved.attempts.some(Boolean)?'В процессе':'Не начато'):'Не начато';card.append(asset,number,label,status);
-    if(enabled&&result){card.classList.add('is-complete');card.dataset.grade=result.grade;const badge=document.createElement('span');badge.className='grade-badge';badge.textContent=result.grade;badge.setAttribute('aria-label',`Оценка ${result.grade}`);card.append(badge);}
+    const asset=document.createElement('span');asset.className='card-preview';asset.dataset.nodeId=preview.node;
+    const img=document.createElement('img');img.src='assets/figma-desktop/'+preview.file;img.alt=preview.alt;img.width=266;img.height=200;asset.append(img);
+    const copy=document.createElement('span');copy.className='card-copy';
+    const label=document.createElement('span');label.className='card-label';label.textContent=`Вариант ${index+1}${difficulty?' ('+difficulty+')':''}`;
+    const status=document.createElement('span');status.className='card-status';status.textContent=enabled?(result?'Пройдено':saved.attempts.some(Boolean)?'В процессе':'Не начато'):'Не начато';
+    if(enabled&&result){const check=document.createElement('img');check.src='assets/figma-desktop/native-course-complete.svg';check.width=20;check.height=20;check.alt='';status.append(check);}
+    copy.append(label,status);card.append(asset,copy);
+    if(enabled&&result){
+      card.classList.add('is-complete');card.dataset.grade=result.grade;
+      const presentation=CourseCards.gradeBadge(result.grade);
+      const badge=document.createElement('span');badge.className='grade-badge';badge.setAttribute('aria-label',presentation.label);
+      const text=document.createElement('img');text.src='assets/figma-desktop/'+presentation.file;text.alt=presentation.label;badge.append(text);card.append(badge);
+    }
     cards.append(card);
   });
   const actions=document.querySelector('#attempt-actions');actions.replaceChildren();
