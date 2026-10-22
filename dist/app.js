@@ -2,7 +2,11 @@
 
 // Full math sequence follows the left-to-right order of the Figma section.
 // The repeated exercise in № 3 is intentional: it is present in the source.
-const state = loadState();
+let state = emptyState();
+let session;
+let saving = Promise.resolve();
+let failed = false;
+let actionBusy = false;
 const courseUrl = 'course.html?subject=math&work=2';
 document.querySelector('#back-to-course').href = courseUrl;
 const form = document.querySelector('#answers');
@@ -12,8 +16,29 @@ const condition = document.querySelector('#condition');
 const feedback = document.querySelector('#feedback');
 const progress = document.querySelector('.progress');
 const fill = document.querySelector('.progress-fill');
+document.querySelector('#back-to-course').addEventListener('click',async event=>{
+  event.preventDefault();await saving;if(!failed)location.href=courseUrl;
+});
 
-function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* The exercise also works when storage is unavailable. */ } }
+function showSaveError(error) {
+  failed = true;
+  document.querySelector('#exercise').hidden = true;
+  const message = document.querySelector('#access-loading');
+  message.hidden = false; message.textContent = error.message;
+  const link = document.createElement('a'); link.href = 'demo.html'; link.textContent = 'Настройки демо';
+  const returnLink = document.createElement('a'); returnLink.href = courseUrl; returnLink.textContent = 'Вернуться к контрольным';
+  message.append(document.createElement('br'), returnLink, document.createElement('br'), link);
+}
+function save() {
+  const progress = JSON.parse(JSON.stringify(state));
+  saving = saving.then(async () => {
+    if (failed) return;
+    const account = await AccessState.save(session.id, session.revision, progress);
+    session = account.attempt;
+    document.querySelector('#account-line').textContent = `Бусины: ${account.balance} · Яйца: ${account.eggs} · ${AccessState.fullAccess(account) ? 'Демо-доступ открыт' : 'Эта попытка уже оплачена'}`;
+  }).catch(showSaveError);
+  return saving;
+}
 
 function render(focusHeading = false) {
   form.replaceChildren();
@@ -109,8 +134,8 @@ function updateAction() {
   nextButton.textContent=checked ? 'Далее' : 'Готово';
   nextButton.disabled=!checked && !isComplete();
 }
-function commitAnswers(values) {
-  state.attempts[state.current]={values,checked:true}; save(); showChecked(TASKS[state.current],values);
+async function commitAnswers(values) {
+  state.attempts[state.current]={values,checked:true}; await save(); if (!failed) showChecked(TASKS[state.current],values);
 }
 function storeDraft() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
@@ -118,12 +143,12 @@ function storeDraft() {
   save();
   updateAction();
 }
-function checkIfComplete() {
+async function checkIfComplete() {
   if (state.current >= TASKS.length || state.attempts[state.current]?.checked) return;
   if (!isComplete()) return;
   const fields=expected(TASKS[state.current]);
   const values=draftValues().map((value,i)=>fields[i].options ? value : normalize(value));
-  commitAnswers(values);
+  await commitAnswers(values);
 }
 function showChecked(task, values) {
   const checks = evaluate(task, values);
@@ -163,13 +188,22 @@ form.addEventListener('change', event=>{
   storeDraft();
 });
 form.addEventListener('submit', event => event.preventDefault());
-nextButton.addEventListener('click', () => {
-  if (state.current === TASKS.length) {
-    Object.assign(state, emptyState()); save(); render(true); return;
+nextButton.addEventListener('click', async () => {
+  if (nextButton.disabled || failed || actionBusy) return;
+  actionBusy = true;
+  nextButton.disabled = true;
+  try {
+    await saving;
+    if (failed) return;
+    if (state.current === TASKS.length) {
+      location.href = AccessState.restartUrl(); return;
+    }
+    if (!state.attempts[state.current]?.checked) { await checkIfComplete(); return; }
+    state.current++;
+    await save(); if (failed) return; render(true); window.scrollTo({top:0, behavior:'instant'});
+  } finally {
+    actionBusy = false;
   }
-  if (!state.attempts[state.current]?.checked) { checkIfComplete(); return; }
-  state.current++;
-  save(); render(true); window.scrollTo({top:0, behavior:'instant'});
 });
 
 function renderResults() {
@@ -183,7 +217,8 @@ function renderResults() {
     `Твоя оценка: ${grade}`,
     `Заданий без ошибок: ${correctTasks} из ${TASKS.length}`,
     `Заданий с ошибками: ${TASKS.length - correctTasks}`,
-    `Верных ответов: ${correctFields} из ${totalFields}`
+    `Верных ответов: ${correctFields} из ${totalFields}`,
+    'За завершение начислено 2 яйца'
   ]) { const p=document.createElement('p'); p.textContent=text; summary.append(p); }
   const returnLink = document.createElement('a');
   returnLink.href = courseUrl;
@@ -196,4 +231,22 @@ function renderResults() {
   title.focus();
 }
 
-render();
+async function startExercise() {
+  try {
+    await AccessState.open();
+    const params = new URLSearchParams(location.search);
+    const account = await AccessState.start(params.get('start'), params.get('previous'));
+    session = account.attempt; state = session.progress;
+    document.querySelector('#account-line').textContent = `Бусины: ${account.balance} · Яйца: ${account.eggs} · ${AccessState.fullAccess(account) ? 'Демо-доступ открыт' : 'За старт списано 15 бусин'}`;
+    document.querySelector('#access-loading').hidden = true;
+    document.querySelector('#exercise').hidden = false;
+    render();
+  } catch (error) {
+    if (error.code === 'BALANCE') {
+      const params = new URLSearchParams(location.search);
+      location.replace(`access.html?${params.toString()}#child`);
+    } else showSaveError(error);
+  }
+}
+window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });
+startExercise();

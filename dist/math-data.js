@@ -92,17 +92,20 @@ function migrateState(saved) {
   result.current=Math.min(oldCurrent, missing===-1 ? 11 : missing);
   return result;
 }
+function validProgress(saved) {
+    if (!saved || saved.version !== 2 || !Number.isInteger(saved.current) || saved.current < 0 || saved.current > TASKS.length || !Array.isArray(saved.attempts) || saved.attempts.length !== TASKS.length) return false;
+    for (let i=0; i<TASKS.length; i++) {
+      const attempt = saved.attempts[i];
+      if (attempt !== null && (typeof attempt !== 'object' || !Array.isArray(attempt.values) || attempt.values.length !== expected(TASKS[i]).length || attempt.values.some(v=>typeof v !== 'string') || typeof attempt.checked !== 'boolean')) return false;
+      if (attempt?.checked && attempt.values.some((v,j)=>!validValue(expected(TASKS[i])[j],v))) return false;
+      if (i < saved.current && !attempt?.checked) return false;
+    }
+    return true;
+}
 function loadState() {
   try {
     const saved = migrateState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
-    if (!saved || saved.version !== 2 || !Number.isInteger(saved.current) || saved.current < 0 || saved.current > TASKS.length || !Array.isArray(saved.attempts) || saved.attempts.length !== TASKS.length) return emptyState();
-    for (let i=0; i<TASKS.length; i++) {
-      const attempt = saved.attempts[i];
-      if (attempt !== null && (!Array.isArray(attempt.values) || attempt.values.length !== expected(TASKS[i]).length || attempt.values.some(v=>typeof v !== 'string') || typeof attempt.checked !== 'boolean')) return emptyState();
-      if (attempt?.checked && attempt.values.some((v,j)=>!validValue(expected(TASKS[i])[j],v))) return emptyState();
-      if (i < saved.current && !attempt?.checked) return emptyState();
-    }
-    return saved;
+    return validProgress(saved) === true ? saved : emptyState();
   } catch { return emptyState(); }
 }
 function completedResult(saved) {

@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#edeeef">
   <title>Контрольные работы — Математика</title>
   <link rel="stylesheet" href="course.css">
+  <link rel="stylesheet" href="access.css">
   <script src="math-data.js" defer></script>
+  <script src="access-state.js" defer></script>
   <script src="course.js" defer></script>
 </head>
 <body>
@@ -14,7 +16,7 @@
     <header class="course-header">
       <button class="course-back" type="button" aria-label="Назад к математике"><span class="back-asset" aria-hidden="true"></span></button>
       <h1>Контрольные работы</h1>
-      <div class="beads" role="img" aria-label="Урок стоит 15 бусин. У тебя осталось 20 бусин"><img src="assets/course-shell.png" alt=""></div>
+      <div class="balance-summary" id="balance-summary" role="status">Загружаем баланс…</div>
     </header>
     <div class="course-layout">
       <aside class="course-sidebar">
@@ -25,10 +27,11 @@
         <div class="subject-tabs" role="tablist" aria-label="Предмет" id="subject-tabs"></div>
         <section role="tabpanel" id="subject-panel" tabindex="0">
           <div class="section-heading"><h2 id="work-title">КР №2 (октябрь)</h2><button type="button" id="toggle-variants" class="toggle-variants" aria-expanded="true" aria-controls="work-variants" aria-label="Свернуть варианты работ">⌃</button></div>
-          <div id="work-variants"><h3>Варианты работ</h3><div class="variant-grid" id="variant-grid"></div></div>
+          <div id="work-variants"><h3>Варианты работ</h3><p class="start-note" id="start-note">Новый старт — 15 бусин. За завершение — 2 яйца.</p><div class="variant-grid" id="variant-grid"></div><div id="attempt-actions" class="attempt-actions"></div></div>
         </section>
       </section>
     </div>
+    <footer class="demo-footer"><a href="demo.html">Настройки демо</a><span>Прототип · без реальных платежей</span></footer>
   </main>
 </body>
 </html>

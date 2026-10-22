@@ -12,9 +12,10 @@ let selectedWork = /^[1-5]$/.test(params.get('work') || '') ? Number(params.get(
 const tabs = document.querySelector('#subject-tabs');
 const workList = document.querySelector('#work-list');
 const cards = document.querySelector('#variant-grid');
+let account;
 function updateUrl(){const url=new URL(location.href);url.searchParams.set('subject',selectedSubject);url.searchParams.set('work',selectedWork);history.replaceState(null,'',url);}
 function renderCourse(){
-  const saved=loadState();
+  const saved=account?.attempt?.progress || emptyState();
   const result=completedResult(saved);
   const subject=SUBJECTS.find(s=>s.id===selectedSubject);
   document.title=`Контрольные работы — ${subject.name}`;
@@ -41,7 +42,7 @@ function renderCourse(){
   cards.replaceChildren();
   ['лёгкий','средний','сложный'].forEach((difficulty,index)=>{
     const enabled=selectedSubject==='math'&&selectedWork===2&&index===0;
-    const card=document.createElement(enabled?'a':'div');card.className='variant-card';if(enabled){card.href='index.html?from=course';}else{card.setAttribute('aria-disabled','true');}
+    const card=document.createElement(enabled&&account?'a':'div');card.className='variant-card';if(enabled&&account){card.href=result?AccessState.restartUrl():'index.html?from=course';card.setAttribute('aria-label',result?'Пройти контрольную ещё раз':account.attempt?'Продолжить контрольную':'Начать контрольную за 15 бусин');}else{card.setAttribute('aria-disabled','true');}
     const asset=document.createElement('span');asset.className='card-asset';asset.setAttribute('aria-hidden','true');const img=document.createElement('img');img.src='assets/course-shell.png';img.alt='';asset.append(img);
     const number=document.createElement('span');number.className='card-number';number.textContent=index+1;
     const label=document.createElement('span');label.className='card-label';label.textContent=`Вариант ${index+1} (${difficulty})`;
@@ -49,9 +50,24 @@ function renderCourse(){
     if(enabled&&result){card.classList.add('is-complete');card.dataset.grade=result.grade;const badge=document.createElement('span');badge.className='grade-badge';badge.textContent=result.grade;badge.setAttribute('aria-label',`Оценка ${result.grade}`);card.append(badge);}
     cards.append(card);
   });
+  const actions=document.querySelector('#attempt-actions');actions.replaceChildren();
+  if (account && selectedSubject==='math' && selectedWork===2 && account.attempt) {
+    const link=document.createElement('a');link.href=result?'index.html':AccessState.restartUrl();
+    link.textContent=result?'Посмотреть результат':'Начать новую попытку · 15 бусин';
+    if (!result && (account.balance>=15 || AccessState.fullAccess(account))) link.addEventListener('click',event=>{if(!confirm('Начать заново? Ответы текущей попытки будут заменены.'))event.preventDefault();});
+    actions.append(link);
+  }
+  if (account) {
+    document.querySelector('#balance-summary').textContent=`Бусины: ${account.balance} · Яйца: ${account.eggs}${AccessState.fullAccess(account)?' · Демо-доступ открыт':''}`;
+    document.querySelector('#start-note').textContent=AccessState.fullAccess(account)?'Демо-доступ: новые попытки без списания бусин. За завершение — 2 яйца.':account.attempt&&!result?'Продолжить начатую попытку можно без списания. Новая попытка — 15 бусин. За завершение — 2 яйца.':'Новый старт — 15 бусин. За завершение — 2 яйца.';
+  }
 }
 document.querySelector('#toggle-variants').addEventListener('click',event=>{const button=event.currentTarget;const expanded=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!expanded));button.setAttribute('aria-label',expanded?'Развернуть варианты работ':'Свернуть варианты работ');document.querySelector('#work-variants').hidden=expanded;});
 document.querySelector('.course-back').addEventListener('click',()=>{selectedSubject='math';selectedWork=2;updateUrl();renderCourse();});
-window.addEventListener('pageshow',renderCourse);
-window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)renderCourse();});
+async function refreshAccount(){
+  try { account=await AccessState.open();renderCourse(); }
+  catch(error){account=null;document.querySelector('#balance-summary').textContent=error.message;renderCourse();}
+}
+window.addEventListener('pageshow',refreshAccount);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAccount();});
 updateUrl();renderCourse();
