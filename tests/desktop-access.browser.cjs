@@ -74,11 +74,17 @@ async function main(){
       else{const inputs=page.locator('#answers input,#answers select');for(let fieldIndex=0;fieldIndex<values.length;fieldIndex++){const input=inputs.nth(fieldIndex);if(await input.evaluate(element=>element.tagName==='SELECT'))await input.selectOption(values[fieldIndex]);else await input.fill(values[fieldIndex]);}}
       await page.getByRole('button',{name:'Готово',exact:true}).click();await page.getByRole('button',{name:'Далее',exact:true}).waitFor();
       if(index===0){assert.equal(await page.locator('input').first().getAttribute('aria-invalid'),'true');await page.reload();await page.getByRole('button',{name:'Далее',exact:true}).waitFor();}
-      await page.getByRole('button',{name:'Далее',exact:true}).click();await page.waitForFunction(index=>AccessState.get().attempt.progress.current===index+1,index);
+      await page.getByRole('button',{name:'Далее',exact:true}).click();
+      if(index===10)await page.waitForURL('**/course.html?subject=math&work=2');
+      else await page.waitForFunction(index=>AccessState.get().attempt.progress.current===index+1,index);
     }
-    await page.getByText('За завершение начислено 2 яйца',{exact:true}).waitFor();assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
-    await page.reload();await page.locator('.result').waitFor();assert.equal((await account()).eggs,2);
-    await visit('course.html?subject=math&work=2');await page.getByLabel('Оценка 4',{exact:true}).waitFor();await shot('course-grade-4',1215,715);
+    await page.getByLabel('Оценка 4',{exact:true}).waitFor();assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
+    const completedAttempt=(await account()).attempt.id;
+    await page.reload();await page.getByLabel('Оценка 4',{exact:true}).waitFor();assert.equal((await account()).eggs,2);
+    assert.equal(await page.locator('.result').count(),0);assert.equal(await page.getByText('Посмотреть результат',{exact:true}).count(),0);
+    await visit('index.html');await page.waitForURL('**/course.html?subject=math&work=2');await page.getByLabel('Оценка 4',{exact:true}).waitFor();
+    assert.equal((await account()).attempt.id,completedAttempt);assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
+    await shot('course-grade-4',1215,715);
     assert.equal(await page.locator('.grade-badge').evaluate(element=>getComputedStyle(element).backgroundColor),'rgb(255, 136, 17)');
     assert.equal(await page.locator('.variant-card.is-complete .card-status').innerText(),'Пройдено');
     const previewCounts={math:2,russian:2,world:2,reading:4};
@@ -87,8 +93,9 @@ async function main(){
       assert.equal(await page.locator('.card-preview img').first().getAttribute('src'),'assets/figma-desktop/preview-'+subject+'-3-1.svg');
       await shot('course-'+subject,1215,715);
     }
-    await visit('index.html');await page.locator('.result').waitFor();
-    await page.getByRole('button',{name:'Пройти ещё раз'}).click();await page.locator('#answers input').first().waitFor();assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
+    await page.locator('#tab-math').click();
+    await page.getByRole('link',{name:'Пройти контрольную ещё раз'}).click();await page.locator('#answers input').first().waitFor();assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
+    assert.notEqual((await account()).attempt.id,completedAttempt);
     await visit('demo.html');await page.locator('#demo-balance').waitFor();await page.getByRole('button',{name:'Сбросить демо-состояние'}).click();await page.getByText('Состояние сброшено',{exact:false}).waitFor();assert.equal((await account()).balance,20);assert.equal((await account()).eggs,0);assert.equal((await account()).entitlement,null);
     const second=await context.newPage();await Promise.all([page.goto(new URL('index.html',base).href),second.goto(new URL('index.html',base).href)]);await Promise.all([page.locator('#exercise').waitFor({state:'visible'}),second.locator('#exercise').waitFor({state:'visible'})]);
     assert.equal((await account()).balance,5);assert.equal((await account()).attempt.id,await second.evaluate(()=>AccessState.get().attempt.id));await second.close();

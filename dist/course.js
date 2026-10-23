@@ -61,10 +61,10 @@ function renderCourse(){
     cards.append(card);
   });
   const actions=document.querySelector('#attempt-actions');actions.replaceChildren();
-  if (account && selectedSubject==='math' && selectedWork===2 && account.attempt) {
-    const link=document.createElement('a');link.href=result?'index.html':AccessState.restartUrl();
-    link.textContent=result?'Посмотреть результат':'Начать новую попытку · 15 бусин';
-    if (!result && (account.balance>=15 || AccessState.fullAccess(account))) link.addEventListener('click',event=>{if(!confirm('Начать заново? Ответы текущей попытки будут заменены.'))event.preventDefault();});
+  if (account && selectedSubject==='math' && selectedWork===2 && account.attempt && !result) {
+    const link=document.createElement('a');link.href=AccessState.restartUrl();
+    link.textContent='Начать новую попытку · 15 бусин';
+    if (account.balance>=15 || AccessState.fullAccess(account)) link.addEventListener('click',event=>{if(!confirm('Начать заново? Ответы текущей попытки будут заменены.'))event.preventDefault();});
     actions.append(link);
   }
   if (account) {

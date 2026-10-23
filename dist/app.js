@@ -46,7 +46,11 @@ function render(focusHeading = false) {
   const completed = state.attempts.filter(a => a?.checked).length;
   progress.setAttribute('aria-valuenow', String(completed));
   fill.style.width = `${completed / TASKS.length * 100}%`;
-  if (state.current === TASKS.length) { renderResults(); return; }
+  if (state.current === TASKS.length) {
+    document.querySelector('#exercise').hidden = true;
+    location.replace(courseUrl);
+    return;
+  }
   const task = TASKS[state.current];
   title.textContent = task.title;
   condition.hidden = !task.condition;
@@ -196,7 +200,7 @@ nextButton.addEventListener('click', async () => {
     await saving;
     if (failed) return;
     if (state.current === TASKS.length) {
-      location.href = AccessState.restartUrl(); return;
+      location.replace(courseUrl); return;
     }
     if (!state.attempts[state.current]?.checked) { await checkIfComplete(); return; }
     state.current++;
@@ -205,31 +209,6 @@ nextButton.addEventListener('click', async () => {
     actionBusy = false;
   }
 });
-
-function renderResults() {
-  title.textContent = 'Все задания выполнены!';
-  condition.hidden = true;
-  document.querySelector('#counter').textContent = 'Математика · 3 класс';
-  const {grade, correctTasks, correctFields, totalFields} = completedResult(state);
-  const summary = document.createElement('div');
-  summary.className = 'result';
-  for (const text of [
-    `Твоя оценка: ${grade}`,
-    `Заданий без ошибок: ${correctTasks} из ${TASKS.length}`,
-    `Заданий с ошибками: ${TASKS.length - correctTasks}`,
-    `Верных ответов: ${correctFields} из ${totalFields}`,
-    'За завершение начислено 2 яйца'
-  ]) { const p=document.createElement('p'); p.textContent=text; summary.append(p); }
-  const returnLink = document.createElement('a');
-  returnLink.href = courseUrl;
-  returnLink.className = 'return-to-course';
-  returnLink.textContent = 'Вернуться к контрольным работам';
-  summary.append(returnLink);
-  form.append(summary);
-  nextButton.textContent = 'Пройти ещё раз';
-  nextButton.disabled = false;
-  title.focus();
-}
 
 async function startExercise() {
   try {
