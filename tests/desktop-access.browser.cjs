@@ -29,7 +29,13 @@ async function main(){
       assert.deepEqual(distorted,[],name+' distorts original Figma label geometry');
       await page.screenshot({path:'/tmp/uchi-desktop-'+name+'.png',fullPage});
     }
-    await visit('course.html?subject=math&work=2');await page.locator('.variant-card[href]').waitFor();assert.equal((await account()).balance,20);
+    await visit('lk.html');await shot('lk',1366,900,true);
+    assert.equal(await page.locator('a,button,input,select').count(),1);
+    const entry=page.getByRole('link',{name:'Контрольные работы',exact:true});await entry.focus();assert.equal(await entry.evaluate(element=>element===document.activeElement),true);
+    assert.deepEqual(await entry.evaluate(element=>({left:element.offsetLeft,top:element.offsetTop,width:element.offsetWidth,height:element.offsetHeight})),{left:290,top:141,width:248,height:248});
+    await page.keyboard.press('Enter');await page.waitForURL('**/course.html?subject=math&work=2');await page.locator('.variant-card[href]').waitFor();assert.equal((await account()).balance,20);
+    await page.getByRole('link',{name:'Назад в личный кабинет'}).click();await page.waitForURL('**/lk.html');
+    await page.getByRole('link',{name:'Контрольные работы',exact:true}).click();await page.locator('.variant-card[href]').waitFor();assert.equal((await account()).balance,20);
     await page.locator('.variant-card[href]').click();await page.locator('#exercise').waitFor({state:'visible'});assert.equal((await account()).balance,5);
     await page.locator('input').first().fill('0');await page.waitForFunction(()=>AccessState.get().attempt.progress.attempts[0]?.values[0]==='0');
     await page.reload();await page.locator('#exercise').waitFor({state:'visible'});assert.equal(await page.locator('input').first().inputValue(),'0');assert.equal((await account()).balance,5);

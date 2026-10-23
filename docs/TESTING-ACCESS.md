@@ -1,5 +1,7 @@
 # Проверка десктопного пути
 
+Вход из ЛК: https://advinone.github.io/Test_UCHI/lk.html. Только первая плашка «Контрольные» активна: клик или Tab → Enter открывает математику, КР №2. Стрелка назад возвращает к ЛК. Остальные плашки и шапка остаются изображением, как в макете «3. Плашка на ЛК». Переходы ЛК ↔ курс не меняют баланс и сохранённые ответы.
+
 Курс: https://advinone.github.io/Test_UCHI/course.html?subject=math&work=2.
 Сброс: https://advinone.github.io/Test_UCHI/demo.html.
 Paywall: https://advinone.github.io/Test_UCHI/access.html#captcha.

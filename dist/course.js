@@ -73,7 +73,6 @@ function renderCourse(){
   }
 }
 document.querySelector('#toggle-variants').addEventListener('click',event=>{const button=event.currentTarget;const expanded=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!expanded));button.setAttribute('aria-label',expanded?'Развернуть варианты работ':'Свернуть варианты работ');document.querySelector('#work-variants').hidden=expanded;});
-document.querySelector('.course-back').addEventListener('click',()=>{selectedSubject='math';selectedWork=2;updateUrl();renderCourse();});
 async function refreshAccount(){
   try { account=await AccessState.open();renderCourse(); }
   catch(error){account=null;document.querySelector('#balance-summary').textContent=error.message;renderCourse();}
