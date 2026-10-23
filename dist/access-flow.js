@@ -2,7 +2,7 @@
 
 const content = document.querySelector('#access-content');
 const params = new URLSearchParams(location.search);
-const courseUrl = 'course.html?subject=math&work=2';
+const courseUrl = 'course.html?subject=math&work=1';
 const returnUrl = `index.html?${params.toString()}`;
 const intent = params.get('start') || 'resume';
 const confirmationKey = `uchi-parent-demo-v2:${intent}`;

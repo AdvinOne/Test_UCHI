@@ -20,6 +20,8 @@ async function main(){
     page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>dialog.accept());
     const visit=route=>page.goto(new URL(route,base).href);
     const account=async()=>{await page.waitForFunction(()=>typeof AccessState!=='undefined'&&AccessState.get()!==null);return page.evaluate(()=>AccessState.get());};
+    async function selectOctober(){await page.locator('.work-item').nth(1).click();await page.locator('.variant-card[href]').waitFor();}
+    async function expectStart(){await page.waitForURL(url=>url.pathname.endsWith('/course.html')&&url.searchParams.get('subject')==='math'&&url.searchParams.get('work')==='1');await page.getByRole('heading',{name:'Вводная КР №1 (сентябрь)',exact:true}).waitFor();assert.equal(await page.locator('.work-item.is-selected').getAttribute('aria-current'),'page');assert.equal(await page.locator('.variant-card[href]').count(),0);}
     async function shot(name,width,height,fullPage=false){
       await page.setViewportSize({width,height});
       await page.waitForFunction(()=>!document.querySelector('.paywall-canvas')||Math.abs(Number(getComputedStyle(document.documentElement).getPropertyValue('--paywall-scale'))-Math.min(innerWidth/1920,innerHeight/920))<.0001);
@@ -29,17 +31,19 @@ async function main(){
       assert.deepEqual(distorted,[],name+' distorts original Figma label geometry');
       await page.screenshot({path:'/tmp/uchi-desktop-'+name+'.png',fullPage});
     }
+    await visit('course.html');await expectStart();assert.equal((await account()).balance,20);
+    await visit('course.html?work=invalid');await expectStart();assert.equal((await account()).balance,20);
     await visit('lk.html');await shot('lk',1366,900,true);
     assert.equal(await page.locator('a,button,input,select').count(),1);
     const entry=page.getByRole('link',{name:'Контрольные работы',exact:true});await entry.focus();assert.equal(await entry.evaluate(element=>element===document.activeElement),true);
     assert.deepEqual(await entry.evaluate(element=>({left:element.offsetLeft,top:element.offsetTop,width:element.offsetWidth,height:element.offsetHeight})),{left:290,top:141,width:248,height:248});
-    await page.keyboard.press('Enter');await page.waitForURL('**/course.html?subject=math&work=2');await page.locator('.variant-card[href]').waitFor();assert.equal((await account()).balance,20);
+    await page.keyboard.press('Enter');await expectStart();assert.equal((await account()).balance,20);
     await page.getByRole('link',{name:'Назад в личный кабинет'}).click();await page.waitForURL('**/lk.html');
-    await page.getByRole('link',{name:'Контрольные работы',exact:true}).click();await page.locator('.variant-card[href]').waitFor();assert.equal((await account()).balance,20);
+    await page.getByRole('link',{name:'Контрольные работы',exact:true}).click();await expectStart();await selectOctober();assert.equal((await account()).balance,20);
     await page.locator('.variant-card[href]').click();await page.locator('#exercise').waitFor({state:'visible'});assert.equal((await account()).balance,5);
     await page.locator('input').first().fill('0');await page.waitForFunction(()=>AccessState.get().attempt.progress.attempts[0]?.values[0]==='0');
     await page.reload();await page.locator('#exercise').waitFor({state:'visible'});assert.equal(await page.locator('input').first().inputValue(),'0');assert.equal((await account()).balance,5);
-    await page.locator('#back-to-course').click();await page.locator('#attempt-actions a').click();await page.waitForURL('**#captcha');
+    await page.locator('#back-to-course').click();await expectStart();await selectOctober();await page.locator('#attempt-actions a').click();await page.waitForURL('**#captcha');
     await page.locator('#captcha-answer').waitFor();await page.frameLocator('iframe').locator('.card-preview img').first().waitFor();await shot('captcha',1215,715);
     assert.equal(await page.locator('.paywall-canvas').count(),0);
     await page.locator('#captcha-answer').fill('0');await page.getByRole('button',{name:'Проверить ответ'}).click();await page.getByText('Неверный ответ. Попробуйте ещё раз.').waitFor();
@@ -75,14 +79,14 @@ async function main(){
       await page.getByRole('button',{name:'Готово',exact:true}).click();await page.getByRole('button',{name:'Далее',exact:true}).waitFor();
       if(index===0){assert.equal(await page.locator('input').first().getAttribute('aria-invalid'),'true');await page.reload();await page.getByRole('button',{name:'Далее',exact:true}).waitFor();}
       await page.getByRole('button',{name:'Далее',exact:true}).click();
-      if(index===10)await page.waitForURL('**/course.html?subject=math&work=2');
+      if(index===10){await expectStart();await selectOctober();}
       else await page.waitForFunction(index=>AccessState.get().attempt.progress.current===index+1,index);
     }
     await page.getByLabel('Оценка 4',{exact:true}).waitFor();assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
     const completedAttempt=(await account()).attempt.id;
     await page.reload();await page.getByLabel('Оценка 4',{exact:true}).waitFor();assert.equal((await account()).eggs,2);
     assert.equal(await page.locator('.result').count(),0);assert.equal(await page.getByText('Посмотреть результат',{exact:true}).count(),0);
-    await visit('index.html');await page.waitForURL('**/course.html?subject=math&work=2');await page.getByLabel('Оценка 4',{exact:true}).waitFor();
+    await visit('index.html');await expectStart();await selectOctober();await page.getByLabel('Оценка 4',{exact:true}).waitFor();
     assert.equal((await account()).attempt.id,completedAttempt);assert.equal((await account()).eggs,2);assert.equal((await account()).balance,5);
     await shot('course-grade-4',1215,715);
     assert.equal(await page.locator('.grade-badge').evaluate(element=>getComputedStyle(element).backgroundColor),'rgb(255, 136, 17)');
@@ -101,7 +105,7 @@ async function main(){
     assert.equal((await account()).balance,5);assert.equal((await account()).attempt.id,await second.evaluate(()=>AccessState.get().attempt.id));await second.close();
     for(const balance of [0,5,14,15]){await page.evaluate(balance=>AccessState.reset(balance),balance);await visit('index.html');if(balance<15)await page.waitForURL('**#captcha');else await page.locator('#exercise').waitFor({state:'visible'});assert.equal((await account()).balance,balance<15?balance:0);}
     await page.evaluate(()=>AccessState.reset(5));await visit('access.html#checkout');await page.waitForURL('**#captcha');
-    await visit('access.html#parent');await page.waitForURL('**#captcha');await page.keyboard.press('Escape');await page.waitForURL('**/course.html?subject=math&work=2');
+    await visit('access.html#parent');await page.waitForURL('**#captcha');await page.keyboard.press('Escape');await expectStart();await selectOctober();
     for(const [grade,correctTasks] of [[2,0],[3,6],[4,9],[5,11]]){
       await page.evaluate(async correctTasks=>{
         await AccessState.reset(20);const account=await AccessState.start(null,null);const progress=emptyState();progress.current=TASKS.length;

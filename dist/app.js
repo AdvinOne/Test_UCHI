@@ -7,7 +7,7 @@ let session;
 let saving = Promise.resolve();
 let failed = false;
 let actionBusy = false;
-const courseUrl = 'course.html?subject=math&work=2';
+const courseUrl = 'course.html?subject=math&work=1';
 document.querySelector('#back-to-course').href = courseUrl;
 const form = document.querySelector('#answers');
 const nextButton = document.querySelector('#continue');

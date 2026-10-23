@@ -9,7 +9,7 @@ const SUBJECTS = [
 const WORKS = ['Вводная КР №1 (сентябрь)','КР №2 (октябрь)','КР №3 (декабрь)','КР №4 (март)','КР №5 (май)'];
 const params = new URLSearchParams(location.search);
 let selectedSubject = SUBJECTS.some(s=>s.id===params.get('subject')) ? params.get('subject') : 'math';
-let selectedWork = /^[1-5]$/.test(params.get('work') || '') ? Number(params.get('work')) : 2;
+let selectedWork = /^[1-5]$/.test(params.get('work') || '') ? Number(params.get('work')) : 1;
 const tabs = document.querySelector('#subject-tabs');
 const workList = document.querySelector('#work-list');
 const cards = document.querySelector('#variant-grid');
